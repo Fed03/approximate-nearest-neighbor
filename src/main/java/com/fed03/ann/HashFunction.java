@@ -5,13 +5,13 @@ import org.apache.commons.math3.linear.ArrayRealVector;
 import java.util.Random;
 import java.util.function.Function;
 
-public class EuclideanHashFunction implements Function<ArrayRealVector, Integer> {
+public class HashFunction implements Function<ArrayRealVector, Integer> {
     private final double w;
     private final int vectorDimension;
     private final double offset;
     private final ArrayRealVector randomProjection;
 
-    public EuclideanHashFunction(double w, int vectorDimension) {
+    public HashFunction(double w, int vectorDimension) {
         this.w = w;
         this.vectorDimension = vectorDimension;
         this.offset = calcOffset(w);

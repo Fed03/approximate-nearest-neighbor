@@ -9,7 +9,7 @@ public class HashFactory {
         this.vectorDimension = vectorDimension;
     }
 
-    public EuclideanHashFunction createHashFunc() {
-        return new EuclideanHashFunction(w, vectorDimension);
+    public HashFunction createHashFunc() {
+        return new HashFunction(w, vectorDimension);
     }
 }

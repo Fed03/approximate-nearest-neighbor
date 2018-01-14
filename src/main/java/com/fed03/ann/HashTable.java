@@ -8,13 +8,13 @@ import java.util.HashMap;
 import java.util.List;
 
 public class HashTable {
-    private final EuclideanHashFunction[] hashFunctions;
+    private final HashFunction[] hashFunctions;
     private final int numberOfHashFunctions;
     private HashMap<Integer, List<ArrayRealVector>> table;
 
     public HashTable(int numberOfHashFunctions, HashFactory factory) {
         this.numberOfHashFunctions = numberOfHashFunctions;
-        this.hashFunctions = new EuclideanHashFunction[numberOfHashFunctions];
+        this.hashFunctions = new HashFunction[numberOfHashFunctions];
         for (int i = 0; i < numberOfHashFunctions; i++) {
             hashFunctions[i] = factory.createHashFunc();
         }
