@@ -1,5 +1,12 @@
 package com.fed03.ann;
 
+import org.apache.commons.math3.linear.ArrayRealVector;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import static java.lang.Math.*;
 
 class Index {
@@ -30,6 +37,20 @@ class Index {
 
     public int getHashTablesNumber() {
         return hashTablesNumber;
+    }
+
+    public void add(ArrayRealVector vector) {
+        for (HashTable table : hashTables) {
+            table.add(vector);
+        }
+    }
+
+    public List<ArrayRealVector> query(ArrayRealVector query, int numberOfNeighbors) {
+        Set<ArrayRealVector> candidates = new HashSet<>();
+        for (HashTable table : hashTables) {
+            candidates.addAll(table.query(query));
+        }
+        return candidates.stream().sorted(new DistanceComparator(query)).limit(numberOfNeighbors).collect(Collectors.toList());
     }
 
     private HashTable[] createHashTables(HashFactory factory) {
