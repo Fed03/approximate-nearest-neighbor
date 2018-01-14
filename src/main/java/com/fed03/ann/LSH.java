@@ -1,3 +1,5 @@
+package com.fed03.ann;
+
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.distribution.RealDistribution;
 import org.apache.commons.math3.linear.ArrayRealVector;
@@ -42,7 +44,7 @@ public final class LSH {
         this.vectorDimension = dataset.get(0).getDimension();
         this.p1 = calcClosenessProbability(1);
         this.p2 = calcClosenessProbability(getC());
-        this.index = new Index(delta, dataset.size(), p1, p2);
+        this.index = new Index(delta, dataset.size(), p1, p2, new HashFactory(binWidth, vectorDimension));
     }
 
     private double calcClosenessProbability(double c) {
