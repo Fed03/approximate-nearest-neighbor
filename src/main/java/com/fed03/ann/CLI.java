@@ -1,18 +1,43 @@
 package com.fed03.ann;
 
 import com.fed03.corpus_texmex_reader.FvecReader;
+import com.fed03.corpus_texmex_reader.IvecReader;
 import org.apache.commons.cli.*;
 import org.apache.commons.math3.linear.ArrayRealVector;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class CLI {
     public static void main(String[] args) {
         Options options = generateOptions();
         CommandLine commandLine = generateCommandLine(options, args);
 
+        List<ArrayRealVector> dataset = getDataset(commandLine);
+        final Index index = buildIndex(commandLine, dataset);
+
+
+        ArrayRealVector query = dataset.get(0);
+        try (FvecReader reader = new FvecReader("C:\\Users\\templ\\Code\\ann\\src\\main\\resources\\dataset\\siftsmall\\siftsmall_query.fvecs")) {
+            query = reader.getNextVector();
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+
+        final Map<ArrayRealVector, Double> result = index.query(query, 10);
+
+        final int[] queryIdxs;
+        try (IvecReader reader = new IvecReader("C:\\Users\\templ\\Code\\ann\\src\\main\\resources\\dataset\\siftsmall\\siftsmall_groundtruth.ivecs")) {
+            queryIdxs = reader.nextGroundTruthIndexes();
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+
+        System.out.println("l");
     }
 
     private static List<ArrayRealVector> getDataset(CommandLine commandLine) {
