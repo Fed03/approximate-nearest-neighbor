@@ -57,7 +57,7 @@ public final class LSH {
 
     private double calcClosenessProbability(double c) {
         RealDistribution normalDistrib = new NormalDistribution(0, 1);
-        return 1 - (2 * normalDistrib.cumulativeProbability(-binWidth / c)) - ((2 * c / Math.sqrt(2 * Math.PI) * binWidth) * (1 - Math.exp(-Math.pow(binWidth, 2) / 2 * Math.pow(c, 2))));
+        return 1 - (2 * normalDistrib.cumulativeProbability(-binWidth / c)) - ((2 / (Math.sqrt(2 * Math.PI) * binWidth / c)) * (1 - Math.exp(-Math.pow(binWidth, 2) / 2 * Math.pow(c, 2))));
     }
 
     private double getC() {
