@@ -1,5 +1,6 @@
 package com.fed03.ann;
 
+import com.fed03.ann.hashes.HashFactory;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.distribution.RealDistribution;
 import org.apache.commons.math3.linear.ArrayRealVector;

@@ -1,4 +1,4 @@
-package com.fed03.ann;
+package com.fed03.ann.hashes;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
 

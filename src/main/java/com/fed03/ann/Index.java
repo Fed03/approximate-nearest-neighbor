@@ -1,5 +1,7 @@
 package com.fed03.ann;
 
+import com.fed03.ann.hashes.HashFactory;
+import com.fed03.ann.hashes.HashTable;
 import org.apache.commons.math3.linear.ArrayRealVector;
 
 import java.util.HashSet;

@@ -1,4 +1,4 @@
-package com.fed03.ann;
+package com.fed03.corpus_texmex_reader;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
@@ -7,7 +7,7 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-public abstract class ByteFileReader<T> implements AutoCloseable {
+abstract class ByteFileReader<T> implements AutoCloseable {
     private static final int STEP_SIZE = 4;
     private static final int BUFFER_SIZE = 32768;
     int numberOfFields;
@@ -30,7 +30,7 @@ public abstract class ByteFileReader<T> implements AutoCloseable {
         inputStream.close();
     }
 
-    public int getNumberOfFields() {
+    int getNumberOfFields() {
         return numberOfFields;
     }
 

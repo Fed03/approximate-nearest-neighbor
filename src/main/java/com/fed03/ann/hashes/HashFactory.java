@@ -1,4 +1,4 @@
-package com.fed03.ann;
+package com.fed03.ann.hashes;
 
 public class HashFactory {
     private final double w;

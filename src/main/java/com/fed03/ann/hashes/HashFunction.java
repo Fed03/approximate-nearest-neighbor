@@ -1,4 +1,4 @@
-package com.fed03.ann;
+package com.fed03.ann.hashes;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
 
@@ -11,7 +11,7 @@ public class HashFunction implements Function<ArrayRealVector, Integer> {
     private final double offset;
     private final ArrayRealVector randomProjection;
 
-    public HashFunction(double w, int vectorDimension) {
+    HashFunction(double w, int vectorDimension) {
         this.w = w;
         this.vectorDimension = vectorDimension;
         this.offset = calcOffset(w);
