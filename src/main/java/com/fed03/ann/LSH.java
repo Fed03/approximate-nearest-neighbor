@@ -13,7 +13,6 @@ public final class LSH {
     private final double binWidth;
     private final List<ArrayRealVector> dataset;
     private final int vectorDimension;
-    private final Index index;
 
     /**
      * The probability that 2 vector close to each other
@@ -45,7 +44,15 @@ public final class LSH {
         this.vectorDimension = dataset.get(0).getDimension();
         this.p1 = calcClosenessProbability(1);
         this.p2 = calcClosenessProbability(getC());
-        this.index = new Index(delta, dataset.size(), p1, p2, new HashFactory(binWidth, vectorDimension));
+    }
+
+    public Index buildIndex() {
+        Index index = new Index(delta, dataset.size(), p1, p2, new HashFactory(binWidth, vectorDimension));
+        for (ArrayRealVector vector : dataset) {
+            index.add(vector);
+        }
+
+        return index;
     }
 
     private double calcClosenessProbability(double c) {
