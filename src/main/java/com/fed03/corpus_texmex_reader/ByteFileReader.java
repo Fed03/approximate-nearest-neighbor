@@ -15,7 +15,7 @@ abstract class ByteFileReader<T> implements AutoCloseable {
 
     ByteFileReader(String filename) {
         try {
-            inputStream = new BufferedInputStream(new FileInputStream(getFile(filename)), BUFFER_SIZE);
+            inputStream = new BufferedInputStream(new FileInputStream(filename), BUFFER_SIZE);
             inputStream.mark(2);
             numberOfFields = inputStream.read();
             inputStream.reset();
