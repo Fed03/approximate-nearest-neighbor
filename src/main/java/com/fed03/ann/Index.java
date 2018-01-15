@@ -5,7 +5,7 @@ import com.fed03.ann.hashes.HashTable;
 import org.apache.commons.math3.linear.ArrayRealVector;
 
 import java.util.HashSet;
-import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -47,12 +47,15 @@ class Index {
         }
     }
 
-    public List<ArrayRealVector> query(ArrayRealVector query, int numberOfNeighbors) {
+    public Map<ArrayRealVector, Double> query(ArrayRealVector query, int numberOfNeighbors) {
         Set<ArrayRealVector> candidates = new HashSet<>();
         for (HashTable table : hashTables) {
             candidates.addAll(table.query(query));
         }
-        return candidates.stream().sorted(new DistanceComparator(query)).limit(numberOfNeighbors).collect(Collectors.toList());
+        return candidates.stream()
+                .sorted(new DistanceComparator(query))
+                .limit(numberOfNeighbors)
+                .collect(Collectors.toMap(vector -> vector, query::getDistance));
     }
 
     private HashTable[] createHashTables(HashFactory factory) {
