@@ -1,12 +1,38 @@
 package com.fed03.ann;
 
+import com.fed03.corpus_texmex_reader.FvecReader;
 import org.apache.commons.cli.*;
+import org.apache.commons.math3.linear.ArrayRealVector;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CLI {
     public static void main(String[] args) {
         Options options = generateOptions();
         CommandLine commandLine = generateCommandLine(options, args);
 
+    }
+
+    private static List<ArrayRealVector> getDataset(CommandLine commandLine) {
+        List<ArrayRealVector> dataset = new ArrayList<>();
+        try (FvecReader reader = new FvecReader(commandLine.getOptionValue("dataset"))) {
+            if (commandLine.hasOption("vector-load-number")) {
+                dataset = reader.getNextVectors(Integer.parseInt(commandLine.getOptionValue("vector-load-number")));
+            } else {
+                dataset = reader.getAllVectors();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+        return dataset;
+    }
+
+    private static Index buildIndex(CommandLine commandLine, List<ArrayRealVector> dataset) {
+        final LSH lsh = new LSH(Double.parseDouble(commandLine.getOptionValue("d")), Double.parseDouble(commandLine.getOptionValue("e")), Double.parseDouble(commandLine.getOptionValue("w")), dataset);
+        return lsh.buildIndex();
     }
 
     private static CommandLine generateCommandLine(final Options options, final String[] args) {
@@ -67,11 +93,20 @@ public class CLI {
                 .hasArg()
                 .build();
 
+        final Option vecLoadNumber = Option.builder("vl")
+                .longOpt("vector-load-number")
+                .required(false)
+                .desc("How many vectors to load from dataset")
+                .hasArg()
+                .type(Integer.TYPE)
+                .build();
+
         final Options options = new Options();
         options.addOption(w);
         options.addOption(eps);
         options.addOption(delta);
         options.addOption(datasetPath);
+        options.addOption(vecLoadNumber);
         return options;
     }
 }
