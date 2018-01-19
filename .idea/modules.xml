@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/ann.iml" filepath="$PROJECT_DIR$/ann.iml" />
+      <module fileurl="file://$PROJECT_DIR$/texmexreader/texmexreader.iml" filepath="$PROJECT_DIR$/texmexreader/texmexreader.iml" />
     </modules>
   </component>
 </project>
