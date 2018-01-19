@@ -1,9 +1,9 @@
 package com.fed03.ann;
 
-import com.fed03.corpus_texmex_reader.FvecReader;
-import com.fed03.corpus_texmex_reader.IvecReader;
+import corpus_texmex_reader.FvecReader;
+import corpus_texmex_reader.IvecReader;
+import corpus_texmex_reader.TexMexVector;
 import org.apache.commons.cli.*;
-import org.apache.commons.math3.linear.ArrayRealVector;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,22 +15,22 @@ public class CLI {
         Options options = generateOptions();
         CommandLine commandLine = generateCommandLine(options, args);
 
-        List<ArrayRealVector> dataset = getDataset(commandLine);
+        List<TexMexVector> dataset = getDataset(commandLine);
         final Index index = buildIndex(commandLine, dataset);
 
 
-        ArrayRealVector query = dataset.get(0);
-        try (FvecReader reader = new FvecReader("C:\\Users\\templ\\Code\\ann\\src\\main\\resources\\dataset\\siftsmall\\siftsmall_query.fvecs")) {
+        TexMexVector query = dataset.get(0);
+        try (FvecReader reader = new FvecReader("C:\\Users\\templ\\Google Drive\\dataset\\siftsmall\\siftsmall_query.fvecs")) {
             query = reader.getNextVector();
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
         }
 
-        final Map<ArrayRealVector, Double> result = index.query(query, 10);
+        final Map<TexMexVector, Double> result = index.query(query, 10);
 
         final int[] queryIdxs;
-        try (IvecReader reader = new IvecReader("C:\\Users\\templ\\Code\\ann\\src\\main\\resources\\dataset\\siftsmall\\siftsmall_groundtruth.ivecs")) {
+        try (IvecReader reader = new IvecReader("C:\\Users\\templ\\Google Drive\\dataset\\siftsmall\\siftsmall_groundtruth.ivecs")) {
             queryIdxs = reader.nextGroundTruthIndexes();
         } catch (IOException e) {
             e.printStackTrace();
@@ -40,8 +40,8 @@ public class CLI {
         System.out.println("l");
     }
 
-    private static List<ArrayRealVector> getDataset(CommandLine commandLine) {
-        List<ArrayRealVector> dataset = new ArrayList<>();
+    private static List<TexMexVector> getDataset(CommandLine commandLine) {
+        List<TexMexVector> dataset = new ArrayList<>();
         try (FvecReader reader = new FvecReader(commandLine.getOptionValue("dataset"))) {
             if (commandLine.hasOption("vector-load-number")) {
                 dataset = reader.getNextVectors(Integer.parseInt(commandLine.getOptionValue("vector-load-number")));
@@ -55,8 +55,9 @@ public class CLI {
         return dataset;
     }
 
-    private static Index buildIndex(CommandLine commandLine, List<ArrayRealVector> dataset) {
-        final LSH lsh = new LSH(Double.parseDouble(commandLine.getOptionValue("d")), Double.parseDouble(commandLine.getOptionValue("e")), Double.parseDouble(commandLine.getOptionValue("w")), dataset);
+    private static Index buildIndex(CommandLine commandLine, List<TexMexVector> dataset) {
+//        final LSH lsh = new LSH(Double.parseDouble(commandLine.getOptionValue("d")), Double.parseDouble(commandLine.getOptionValue("e")), Double.parseDouble(commandLine.getOptionValue("w")), dataset);
+        final LSH lsh = new LSH(0.1, 0.5, 1546, dataset);
         return lsh.buildIndex();
     }
 

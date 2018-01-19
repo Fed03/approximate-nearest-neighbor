@@ -1,17 +1,21 @@
 package com.fed03.ann;
 
 import com.fed03.ann.hashes.HashFactory;
+import corpus_texmex_reader.TexMexVector;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.distribution.RealDistribution;
-import org.apache.commons.math3.linear.ArrayRealVector;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+
+import static java.lang.Math.*;
 
 public final class LSH {
     private final double delta;
     private final double eps;
     private final double binWidth;
-    private final List<ArrayRealVector> dataset;
+    private final List<TexMexVector> dataset;
     private final int vectorDimension;
 
     /**
@@ -36,7 +40,7 @@ public final class LSH {
      *                 therefore the number of points in every bucket depend on this param.
      * @param dataset  the training dataset
      */
-    public LSH(double delta, double eps, double binWidth, List<ArrayRealVector> dataset) {
+    public LSH(double delta, double eps, double binWidth, List<TexMexVector> dataset) {
         this.delta = delta;
         this.eps = eps;
         this.binWidth = binWidth;
@@ -47,9 +51,19 @@ public final class LSH {
     }
 
     public Index buildIndex() {
-        Index index = new Index(delta, dataset.size(), p1, p2, new HashFactory(binWidth, vectorDimension));
-        for (ArrayRealVector vector : dataset) {
-            index.add(vector);
+        Index index = new Index(delta, dataset, p1, p2, new HashFactory(binWidth, vectorDimension));
+        final List<Future<Integer>> tablesFutures = index.build();
+        final boolean result = tablesFutures.stream().mapToInt(future -> {
+            try {
+                return future.get();
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+                throw new RuntimeException();
+            }
+        }).allMatch(integer -> integer == dataset.size());
+
+        if (!result) {
+            throw new RuntimeException("Not all vectors are been added to the tables");
         }
 
         return index;
@@ -57,7 +71,7 @@ public final class LSH {
 
     private double calcClosenessProbability(double c) {
         RealDistribution normalDistrib = new NormalDistribution(0, 1);
-        return 1 - (2 * normalDistrib.cumulativeProbability(-binWidth / c)) - ((2 / (Math.sqrt(2 * Math.PI) * binWidth / c)) * (1 - Math.exp(-Math.pow(binWidth, 2) / 2 * Math.pow(c, 2))));
+        return 1 - (2 * normalDistrib.cumulativeProbability(-binWidth / c)) - ((2 / (sqrt(2 * PI) * binWidth / c)) * (1 - exp(-pow(binWidth, 2) / (2 * pow(c, 2)))));
     }
 
     private double getC() {

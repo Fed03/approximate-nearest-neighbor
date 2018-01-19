@@ -1,19 +1,19 @@
 package com.fed03.ann;
 
-import org.apache.commons.math3.linear.ArrayRealVector;
+import corpus_texmex_reader.TexMexVector;
 
 import java.util.Comparator;
 
-public class DistanceComparator implements Comparator<ArrayRealVector> {
+public class DistanceComparator implements Comparator<TexMexVector> {
 
-    private final ArrayRealVector query;
+    private final TexMexVector query;
 
-    public DistanceComparator(ArrayRealVector query) {
+    public DistanceComparator(TexMexVector query) {
         this.query = query;
     }
 
     @Override
-    public int compare(ArrayRealVector one, ArrayRealVector two) {
+    public int compare(TexMexVector one, TexMexVector two) {
         Double oneDistance = query.getDistance(one);
         Double twoDistance = query.getDistance(two);
         return oneDistance.compareTo(twoDistance);

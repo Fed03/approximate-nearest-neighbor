@@ -1,18 +1,18 @@
-package com.fed03.corpus_texmex_reader;
-
-import org.apache.commons.math3.linear.ArrayRealVector;
+package corpus_texmex_reader;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class FvecReader extends ByteFileReader<Float> {
+    private int index = 0;
+
     public FvecReader(String filename) {
         super(filename);
     }
 
-    public List<ArrayRealVector> getAllVectors() {
-        List<ArrayRealVector> vectors = new ArrayList<>();
+    public List<TexMexVector> getAllVectors() {
+        List<TexMexVector> vectors = new ArrayList<>();
         try {
             while (true) {
                 vectors.add(getNextVector());
@@ -22,8 +22,8 @@ public class FvecReader extends ByteFileReader<Float> {
         return vectors;
     }
 
-    public List<ArrayRealVector> getNextVectors(int size) throws IOException {
-        List<ArrayRealVector> vectors = new ArrayList<>(size);
+    public List<TexMexVector> getNextVectors(int size) throws IOException {
+        List<TexMexVector> vectors = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
             vectors.add(getNextVector());
         }
@@ -31,14 +31,15 @@ public class FvecReader extends ByteFileReader<Float> {
         return vectors;
     }
 
-    public ArrayRealVector getNextVector() throws IOException {
+    public TexMexVector getNextVector() throws IOException {
         byte[] components = nextRawLine();
 
-        ArrayRealVector vector = new ArrayRealVector(getVectorDimension());
+        TexMexVector vector = new TexMexVector(index, getVectorDimension());
         for (int i = 0; i < getVectorDimension(); i++) {
             float value = getFieldValueByIndex(components, i);
             vector.setEntry(i, value);
         }
+        index++;
         return vector;
     }
 

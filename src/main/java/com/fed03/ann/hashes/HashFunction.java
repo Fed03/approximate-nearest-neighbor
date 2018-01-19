@@ -1,30 +1,30 @@
 package com.fed03.ann.hashes;
 
-import org.apache.commons.math3.linear.ArrayRealVector;
+import corpus_texmex_reader.TexMexVector;
 
 import java.util.Random;
 import java.util.function.Function;
 
-public class HashFunction implements Function<ArrayRealVector, Integer> {
+public class HashFunction implements Function<TexMexVector, Integer> {
     private final double w;
     private final int vectorDimension;
     private final double offset;
-    private final ArrayRealVector randomProjection;
+    private final TexMexVector randomProjection;
 
     HashFunction(double w, int vectorDimension) {
         this.w = w;
         this.vectorDimension = vectorDimension;
-        this.offset = calcOffset(w);
-        this.randomProjection = calcRandomProjection();
+        Random rand = new Random();
+        this.offset = calcOffset(rand);
+        this.randomProjection = calcRandomProjection(rand);
     }
 
-    public Integer apply(ArrayRealVector vector) {
+    public Integer apply(TexMexVector vector) {
         return (int) Math.floor((vector.dotProduct(randomProjection) + offset) / w);
     }
 
-    private ArrayRealVector calcRandomProjection() {
-        ArrayRealVector projection = new ArrayRealVector(vectorDimension);
-        Random rand = new Random();
+    private TexMexVector calcRandomProjection(Random rand) {
+        TexMexVector projection = new TexMexVector(-1, vectorDimension);
         for (int i = 0; i < vectorDimension; i++) {
             projection.setEntry(i, rand.nextGaussian());
         }
@@ -32,7 +32,7 @@ public class HashFunction implements Function<ArrayRealVector, Integer> {
         return projection;
     }
 
-    private static double calcOffset(double w) {
-        return new Random().nextDouble() * w;
+    private double calcOffset(Random rand) {
+        return rand.nextDouble() * w;
     }
 }

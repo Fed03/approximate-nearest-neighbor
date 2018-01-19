@@ -2,10 +2,10 @@ package corpus_texmex_reader;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
 
-public class Vector extends ArrayRealVector {
+public class TexMexVector extends ArrayRealVector {
     private final int index;
 
-    public Vector(int index, int size) {
+    public TexMexVector(int index, int size) {
         super(size);
         this.index = index;
     }

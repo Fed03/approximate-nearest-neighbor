@@ -1,4 +1,4 @@
-package com.fed03.corpus_texmex_reader;
+package corpus_texmex_reader;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;

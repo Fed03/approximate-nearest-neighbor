@@ -1,4 +1,4 @@
-package com.fed03.corpus_texmex_reader;
+package corpus_texmex_reader;
 
 import java.io.IOException;
 import java.util.ArrayList;
