@@ -38,6 +38,7 @@ public class RadiusEvaluator {
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
+        pool.shutdownNow();
 
         return 0.90 * radius;
     }
@@ -48,6 +49,6 @@ public class RadiusEvaluator {
     }
 
     private TexMexVector getClosestVector(TexMexVector texMexVector) {
-        return (dataset.stream().sorted(new DistanceComparator(texMexVector)).collect(Collectors.toList())).get(0);
+        return (dataset.stream().sorted(new DistanceComparator(texMexVector)).collect(Collectors.toList())).get(1);
     }
 }

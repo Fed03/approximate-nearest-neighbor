@@ -5,10 +5,7 @@ import com.fed03.ann.hashes.HashTable;
 import corpus_texmex_reader.TexMexVector;
 
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 import static java.lang.Math.*;
@@ -57,6 +54,26 @@ class Index {
         }
     }
 
+    public Map<TexMexVector, List<TexMexVector>> query(List<TexMexVector> queries, int numberOfNeighbors) {
+        ExecutorService pool = Executors.newCachedThreadPool();
+        Map<TexMexVector, Future<List<TexMexVector>>> futures = new HashMap<>(queries.size());
+        for (TexMexVector query : queries) {
+            Future<List<TexMexVector>> future = pool.submit(() -> this.query(query, numberOfNeighbors));
+            futures.put(query, future);
+        }
+
+        pool.shutdown();
+
+        return futures.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entrySet -> {
+            try {
+                return entrySet.getValue().get();
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+                return new ArrayList<>(0);
+            }
+        }));
+    }
+
     public List<TexMexVector> query(TexMexVector query, int numberOfNeighbors) {
         Set<TexMexVector> candidates = new HashSet<>();
         for (HashTable table : hashTables) {
@@ -79,6 +96,8 @@ class Index {
             return pool.invokeAll(callables);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
+        } finally {
+            pool.shutdown();
         }
     }
 
