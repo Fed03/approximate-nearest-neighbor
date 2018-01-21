@@ -2,10 +2,11 @@ package com.fed03.ann.hashes;
 
 import corpus_texmex_reader.TexMexVector;
 
+import java.io.Serializable;
 import java.util.Random;
 import java.util.function.Function;
 
-public class HashFunction implements Function<TexMexVector, Integer> {
+public class HashFunction implements Function<TexMexVector, Integer>, Serializable {
     private final double w;
     private final int vectorDimension;
     private final double offset;

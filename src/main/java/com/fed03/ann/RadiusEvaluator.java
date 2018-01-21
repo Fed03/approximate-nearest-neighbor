@@ -9,8 +9,8 @@ import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 public class RadiusEvaluator {
-    private static final int N_RANDOM_QUERY = 50;
-    private static final int EVAL_TIMEOUT_SECONDS = 30;
+    private static final int N_RANDOM_QUERY = 20;
+    private static final int EVAL_TIMEOUT_SECONDS = 40;
     private final List<TexMexVector> dataset;
     private final Random random;
 
@@ -20,27 +20,28 @@ public class RadiusEvaluator {
     }
 
     public double getRadius() {
-        double radius = 0;
-        ExecutorService pool = Executors.newCachedThreadPool();
+        double meanRadius = 0;
+        ExecutorService pool = Executors.newFixedThreadPool(N_RANDOM_QUERY);
         List<Callable<Double>> func = new ArrayList<>(N_RANDOM_QUERY);
         for (int i = 0; i < N_RANDOM_QUERY; i++) {
             func.add(() -> getClosestDistance(dataset.get(random.nextInt(dataset.size()))));
         }
 
+        List<Double> radiuses = new ArrayList<>(N_RANDOM_QUERY);
         try {
             final List<Future<Double>> futures = pool.invokeAll(func, EVAL_TIMEOUT_SECONDS, TimeUnit.SECONDS);
-            List<Double> radiuses = new ArrayList<>(N_RANDOM_QUERY);
             for (Future<Double> future : futures) {
-                radiuses.add(future.get());
+                final Double radius = future.get();
+                radiuses.add(radius);
             }
-            double sum = radiuses.stream().reduce(0.0, (prev, next) -> prev + next);
-            radius = sum / radiuses.size();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
+        } catch (InterruptedException | ExecutionException | CancellationException ignored) {
         }
-        pool.shutdownNow();
+        pool.shutdown();
 
-        return 0.90 * radius;
+        double sum = radiuses.stream().reduce(0.0, (prev, next) -> prev + next);
+        meanRadius = sum / radiuses.size();
+
+        return 0.90 * meanRadius;
     }
 
     private double getClosestDistance(TexMexVector texMexVector) {

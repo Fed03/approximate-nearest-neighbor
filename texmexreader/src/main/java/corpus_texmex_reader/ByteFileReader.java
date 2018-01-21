@@ -9,7 +9,7 @@ import java.nio.ByteOrder;
 
 abstract class ByteFileReader<T> implements AutoCloseable {
     private static final int STEP_SIZE = 4;
-    private static final int BUFFER_SIZE = 32768;
+    private static final int BUFFER_SIZE = 1048576;
     int numberOfFields;
     private InputStream inputStream;
 

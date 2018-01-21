@@ -2,13 +2,14 @@ package com.fed03.ann.hashes;
 
 import corpus_texmex_reader.TexMexVector;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class HashTable {
+public class HashTable implements Serializable {
     private final HashFunction[] hashFunctions;
     private final int numberOfHashFunctions;
     private ConcurrentHashMap<Integer, List<TexMexVector>> table;

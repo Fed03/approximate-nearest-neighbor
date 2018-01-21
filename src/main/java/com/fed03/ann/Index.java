@@ -4,13 +4,14 @@ import com.fed03.ann.hashes.HashFactory;
 import com.fed03.ann.hashes.HashTable;
 import corpus_texmex_reader.TexMexVector;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 import static java.lang.Math.*;
 
-class Index {
+class Index implements Serializable {
     private final int numberOfHashFunctions;
     private final int hashTablesNumber;
     private final HashTable[] hashTables;
