@@ -1,6 +1,7 @@
 package com.fed03.ann;
 
 import corpus_texmex_reader.FvecReader;
+import corpus_texmex_reader.IvecReader;
 import corpus_texmex_reader.TexMexVector;
 import org.apache.commons.cli.*;
 
@@ -10,37 +11,74 @@ import java.util.List;
 import java.util.Map;
 
 public class CLI {
+    private static List<int[]> groundtruth;
+    private static int numbersOfNeighbors;
+
     public static void main(String[] args) {
         Options options = generateCommonOptions();
         CommandLine commandLine = generateCommandLine(options, args);
+        numbersOfNeighbors = Integer.parseInt(commandLine.getOptionValue("nb"));
 
+        final Index index;
         if (commandLine.hasOption("parametrized")) {
-            startParametrized(args);
+            index = startParametrized(args);
         } else {
-            startNormal(args);
+            index = startNormal(args);
+        }
+
+        final Map<TexMexVector, List<TexMexVector>> results = index.query(getQueries(commandLine), numbersOfNeighbors);
+        groundtruth = loadGroundtruth(commandLine.getOptionValue("groundtruth"), commandLine);
+        printResults(results);
+    }
+
+    private static List<int[]> loadGroundtruth(String groundtruthFile, CommandLine commandLine) {
+        List<int[]> groundtruth = new ArrayList<>();
+        try (IvecReader reader = new IvecReader(groundtruthFile)) {
+            if (commandLine.hasOption("query-load-number")) {
+                int loadNumber = Integer.parseInt(commandLine.getOptionValue("query-load-number"));
+                for (int i = 0; i < loadNumber; i++) {
+                    groundtruth.add(reader.nextGroundTruthIndexes());
+                }
+            } else {
+                groundtruth = reader.getAllGroundTruthIndexes();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+        return groundtruth;
+    }
+
+    private static void printResults(Map<TexMexVector, List<TexMexVector>> results) {
+        for (Map.Entry<TexMexVector, List<TexMexVector>> entry : results.entrySet()) {
+            final int queryIdx = entry.getKey().getIndex();
+            System.out.printf("Query idx: %d\n", queryIdx);
+            System.out.printf("%10s%20s\n", "Result idx", "Groundtruth");
+            List<TexMexVector> result = entry.getValue();
+            for (int i = 0; i < result.size(); i++) {
+                System.out.printf("%10d%20d\n", result.get(i).getIndex(), groundtruth.get(queryIdx)[i]);
+            }
         }
     }
 
-    private static void startNormal(String[] args) {
+    private static Index startNormal(String[] args) {
         Options options = generateNormalOptions();
         CommandLine commandLine = generateCommandLine(options, args);
 
         List<TexMexVector> dataset = getDataset(commandLine);
         final LSH lsh = new LSH(Integer.parseInt(commandLine.getOptionValue("k")), Integer.parseInt(commandLine.getOptionValue("L")), dataset);
 
-        Index index = lsh.buildIndex();
-        Map<TexMexVector, List<TexMexVector>> results = index.query(getQueries(commandLine), 10);
+        return lsh.buildIndex();
     }
 
-    private static void startParametrized(String[] args) {
+    private static Index startParametrized(String[] args) {
         Options options = generateParametrizedOptions();
         CommandLine commandLine = generateCommandLine(options, args);
 
         List<TexMexVector> dataset = getDataset(commandLine);
         final LSH lsh = new LSH(Double.parseDouble(commandLine.getOptionValue("d")), Double.parseDouble(commandLine.getOptionValue("e")), Double.parseDouble(commandLine.getOptionValue("w")), dataset);
 
-        Index index = lsh.buildIndex();
-        Map<TexMexVector, List<TexMexVector>> results = index.query(getQueries(commandLine), 10);
+        return lsh.buildIndex();
     }
 
     private static List<TexMexVector> getDataset(CommandLine commandLine) {
@@ -133,6 +171,23 @@ public class CLI {
                 .type(Integer.TYPE)
                 .build();
 
+        final Option numberOfNeighbors = Option.builder("nb")
+                .longOpt("number-of-neighbors")
+                .required(true)
+                .desc("How many neighbors to return per query")
+                .hasArg()
+                .type(Integer.TYPE)
+                .build();
+
+        final Option groundTruth = Option.builder()
+                .longOpt("groundtruth")
+                .argName("GROUNDTRUTH_PATH")
+                .required(true)
+                .desc("The groundtruth file in .ivecs format")
+                .hasArg()
+                .build();
+
+
         final Options options = new Options();
         options.addOption(parametrized);
         options.addOption(datasetPath);
@@ -140,6 +195,8 @@ public class CLI {
         options.addOption(vecLoadNumber);
         options.addOption(queryLoadNumber);
         options.addOption(queryPath);
+        options.addOption(numberOfNeighbors);
+        options.addOption(groundTruth);
         return options;
     }
 
