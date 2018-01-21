@@ -32,19 +32,23 @@ class Index {
      */
     Index(double delta, Collection<TexMexVector> dataset, double p1, double p2, HashFactory factory) {
         this.dataset = dataset;
-//        this.numberOfHashFunctions = calcNumberOfHashFunctions(dataset.size(), p2);
-//        this.hashTablesNumber = calcHashTablesNumber(delta, p1, numberOfHashFunctions);
-        this.numberOfHashFunctions = 8;
-        this.hashTablesNumber = 16;
+        this.numberOfHashFunctions = calcNumberOfHashFunctions(dataset.size(), p2);
+        this.hashTablesNumber = calcHashTablesNumber(delta, p1, numberOfHashFunctions);
         this.hashTables = createHashTables(factory);
     }
 
-    public int getNumberOfHashFunctions() {
-        return numberOfHashFunctions;
-    }
 
-    public int getHashTablesNumber() {
-        return hashTablesNumber;
+    /**
+     * @param dataset The dataset
+     * @param k       The number of hash functions
+     * @param L       The number of hash tables
+     * @param factory Factory responsible of creating hash tables and their functions
+     */
+    Index(Collection<TexMexVector> dataset, int k, int L, HashFactory factory) {
+        numberOfHashFunctions = k;
+        hashTablesNumber = L;
+        this.dataset = dataset;
+        hashTables = createHashTables(factory);
     }
 
     public void add(TexMexVector vector) {
@@ -53,15 +57,16 @@ class Index {
         }
     }
 
-    public Map<TexMexVector, Double> query(TexMexVector query, int numberOfNeighbors) {
+    public List<TexMexVector> query(TexMexVector query, int numberOfNeighbors) {
         Set<TexMexVector> candidates = new HashSet<>();
         for (HashTable table : hashTables) {
             candidates.addAll(table.query(query));
         }
+
         return candidates.stream()
                 .sorted(new DistanceComparator(query))
                 .limit(numberOfNeighbors)
-                .collect(Collectors.toMap(vector -> vector, query::getDistance));
+                .collect(Collectors.toList());
     }
 
     public List<Future<Integer>> build() {
