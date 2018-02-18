@@ -12,12 +12,11 @@ import java.util.Map;
 
 public class CLI {
     private static List<int[]> groundtruth;
-    private static int numbersOfNeighbors;
 
     public static void main(String[] args) {
         Options options = generateCommonOptions();
         CommandLine commandLine = generateCommandLine(options, args);
-        numbersOfNeighbors = Integer.parseInt(commandLine.getOptionValue("nb"));
+        int numbersOfNeighbors = Integer.parseInt(commandLine.getOptionValue("nb"));
 
         final Index index;
         if (commandLine.hasOption("parametrized")) {
